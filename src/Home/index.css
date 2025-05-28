@@ -1,0 +1,33 @@
+.home-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  color: #ffff;
+  height: 100vh;
+  background: url('https://assets.ccbp.in/frontend/react-js/home-lg-bg.png');
+  background-size: cover;
+}
+
+.nav-bar {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: navy;
+}
+
+.center-items {
+  display: flex;
+}
+
+.nav-button {
+  padding: 10px;
+  background-color: skyblue;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+}
+
+button {
+  cursor: pointer;
+}
