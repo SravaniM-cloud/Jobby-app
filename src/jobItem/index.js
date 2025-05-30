@@ -15,7 +15,7 @@ const JobItem = props => {
     <li className="card" onClick={onClickJobItem}>
       <div className="img-title-container">
         <div className="image-container">
-          <img src={jobDetails.company_logo_url} alt="" />
+          <img src={jobDetails.company_logo_url} alt="company logo" />
         </div>
         <div className="titles-container">
           <h4>{jobDetails.title}</h4>

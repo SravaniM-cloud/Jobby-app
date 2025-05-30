@@ -1,5 +1,5 @@
 import {Component} from 'react'
-import Cookie from 'js-cookie'
+import Cookies from 'js-cookie'
 import {withRouter} from 'react-router-dom'
 import {CONSTANTS} from '../constants'
 import './index.css'
@@ -12,6 +12,7 @@ class Login extends Component {
       password: '',
       errorMessage: '',
     }
+    this.check()
   }
 
   onChangeUsername = event => {
@@ -29,6 +30,25 @@ class Login extends Component {
   onClickLogin = async event => {
     event.preventDefault()
     const {username, password} = this.state
+
+    // if (username.trim() === '') {
+    //   this.setState({
+    //     errorMessage: 'username should not be empty',
+    //   })
+    //   return
+    // }
+
+    // if (password.trim() === '') {
+    //   this.setState({
+    //     errorMessage: 'password should not be empty',
+    //   })
+    //   return
+    // }
+
+    this.setState({
+      errorMessage: '',
+    })
+
     const otherOptions = {
       method: 'POST',
       body: JSON.stringify({
@@ -44,18 +64,25 @@ class Login extends Component {
       )
       const data = await apiResponse.json()
       if (apiResponse.ok) {
-        Cookie.set('jwt-token', data.jwt_token)
         this.setState({
           errorMessage: '',
         })
+        Cookies.set('jwt_token', data.jwt_token, 30)
         const {history} = this.props
-
-        history.push('/home')
+        history.replace('/')
       } else {
         this.setState({errorMessage: data.error_msg})
       }
     } catch (error) {
       console.log('Something went wrong:', error)
+    }
+  }
+
+  check() {
+    const token = Cookies.get('jwt_token')
+    if (token !== undefined) {
+      const {history} = this.props
+      history.replace('/')
     }
   }
 
@@ -81,7 +108,7 @@ class Login extends Component {
               onChange={this.onChangeUsername}
             />
             <br />
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">PASSWORD</label>
             <br />
             <input
               id="password"
@@ -93,7 +120,7 @@ class Login extends Component {
             <br />
             <p className="error">{errorMessage}</p>
             <button type="submit" className="submit-button">
-              Submit
+              Login
             </button>
           </form>
         </div>

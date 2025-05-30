@@ -2,8 +2,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: url('https://assets.ccbp.in/frontend/react-js/jobby-app-not-found-img.png');
-  background-size: cover;
   height: 100%;
   width: 100%;
 }

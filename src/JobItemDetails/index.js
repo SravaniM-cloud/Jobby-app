@@ -1,5 +1,5 @@
 import {Component} from 'react'
-import Cookie from 'js-cookie'
+import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
 
@@ -23,11 +23,14 @@ class JobItemDetails extends Component {
   componentWillUnmount() {}
 
   getJobDetails = async () => {
+    this.setState({
+      status: CONSTANTS.API_STATUS.IN_PROGRESS,
+    })
     const {match} = this.props
     const {params} = match
     const {id} = params
 
-    const token = Cookie.get('jwt-token')
+    const token = Cookies.get('jwt_token')
 
     const otherOptions = {
       headers: {
@@ -64,7 +67,10 @@ class JobItemDetails extends Component {
       <>
         <div className="img-title-container">
           <div className="image-container">
-            <img src={jobDetails.company_logo_url} alt="" />
+            <img
+              src={jobDetails.company_logo_url}
+              alt="job details company logo"
+            />
           </div>
           <div className="titles-container">
             <h4>{jobDetails.title}</h4>
@@ -116,17 +122,20 @@ class JobItemDetails extends Component {
           <h4>Life at Company</h4>
           <div>
             <p>{lifeAtCompany.description}</p>
-            <img src={lifeAtCompany.image_url} alt="lifeAtCompany" />
+            <img src={lifeAtCompany.image_url} alt="life at company" />
           </div>
         </div>
         <div>
-          <h3>Similar Jobs</h3>
+          <h1>Similar Jobs</h1>
           <ul>
             {similarJobs.map(item => (
               <li key={item.id}>
                 <div className="img-title-container">
                   <div className="image-container">
-                    <img src={item.company_logo_url} alt="" />
+                    <img
+                      src={item.company_logo_url}
+                      alt="similar job company logo"
+                    />
                   </div>
                   <div className="titles-container">
                     <h4>{item.title}</h4>
@@ -158,7 +167,17 @@ class JobItemDetails extends Component {
 
   failureView = () => (
     <>
-      <p>NO data to display</p>
+      <div>
+        <img
+          src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+          alt="failure view"
+        />
+        <h4>Oops! Something Went Wrong</h4>
+        <p>We cannot seem to find the page you are looking for</p>
+        <button type="button" className="button" onClick={this.getJobDetails}>
+          Retry
+        </button>
+      </div>
     </>
   )
 
@@ -172,7 +191,7 @@ class JobItemDetails extends Component {
       return this.failureView()
     }
     return (
-      <div className="loader">
+      <div data-testid="loader" className="loader">
         <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
       </div>
     )

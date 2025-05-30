@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-constructor */
 import {Component} from 'react'
 import {withRouter} from 'react-router-dom'
-import Cookie from 'js-cookie'
+import Cookies from 'js-cookie'
 import Loader from 'react-loader-spinner'
 import {CONSTANTS} from '../constants'
 import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
@@ -74,7 +74,7 @@ class Jobs extends Component {
       this.setState({
         profileStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
       })
-      const token = Cookie.get('jwt-token')
+      const token = Cookies.get('jwt-token')
 
       const otherOptions = {
         headers: {
@@ -107,7 +107,7 @@ class Jobs extends Component {
       this.setState({
         jobsStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
       })
-      const token = Cookie.get('jwt-token')
+      const token = Cookies.get('jwt_token')
 
       const otherOptions = {
         headers: {
@@ -183,7 +183,7 @@ class Jobs extends Component {
 
     return (
       <>
-        <img src={profileDetails.profile_image_url} alt="profile-image" />
+        <img src={profileDetails.profile_image_url} alt="profile" />
         <h4>{profileDetails.name}</h4>
         <p>{profileDetails.short_bio}</p>
       </>
@@ -211,8 +211,8 @@ class Jobs extends Component {
                 src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
                 alt="No jobs present"
               />
-              <h4>No Jobs Fount</h4>
-              <p>We could not find any other jobs.Try other filters</p>
+              <h4>No Jobs Found</h4>
+              <p>We could not find any jobs. Try other filters</p>
             </div>
           )
         }
@@ -220,7 +220,7 @@ class Jobs extends Component {
 
       case CONSTANTS.API_STATUS.IN_PROGRESS:
         view = (
-          <div className="loader">
+          <div data-testid="loader" className="loader">
             <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
           </div>
         )
@@ -234,7 +234,7 @@ class Jobs extends Component {
               alt="failure view"
             />
             <h4>Oops! Something Went Wrong</h4>
-            <p>We cannot seem to find the page your are looking for</p>
+            <p>We cannot seem to find the page you are looking for</p>
             <button type="button" className="button" onClick={this.getJobs}>
               Retry
             </button>
@@ -283,7 +283,7 @@ class Jobs extends Component {
         break
       case CONSTANTS.API_STATUS.IN_PROGRESS:
         view = (
-          <div className="loader">
+          <div data-testid="loader" className="loader">
             <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
           </div>
         )
@@ -304,7 +304,7 @@ class Jobs extends Component {
             <div>{this.getProfileView()}</div>
             <hr />
             <div>
-              <h4>Types of Employment</h4>
+              <h4>Type of Employment</h4>
               <ul>
                 {employmentTypesList.map(item => (
                   <li key={item.employmentTypeId}>
@@ -343,7 +343,11 @@ class Jobs extends Component {
               value={searchText}
               onChange={this.onSearchInput}
             />
-            <button type="button" onClick={this.onClickSearch}>
+            <button
+              data-testid="searchButton"
+              type="button"
+              onClick={this.onClickSearch}
+            >
               Search
             </button>
             {this.getJobsView()}
