@@ -2,7 +2,9 @@
 import {Component} from 'react'
 import {withRouter} from 'react-router-dom'
 import Cookie from 'js-cookie'
+import Loader from 'react-loader-spinner'
 import {CONSTANTS} from '../constants'
+import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css'
 
 import './index.css'
 import JobItem from '../jobItem'
@@ -51,8 +53,10 @@ class Jobs extends Component {
     super(props)
     this.state = {
       typeOfEmp: [],
-      salaryRange: [],
+      salaryRange: '',
       jobItemsList: [],
+      jobsStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
+      profileStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
       profileDetails: {},
       searchText: '',
     }
@@ -67,6 +71,9 @@ class Jobs extends Component {
 
   getProfile = async () => {
     try {
+      this.setState({
+        profileStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
+      })
       const token = Cookie.get('jwt-token')
 
       const otherOptions = {
@@ -82,9 +89,14 @@ class Jobs extends Component {
         const profileDetails = await apiResponse.json()
         this.setState({
           profileDetails: profileDetails.profile_details,
+          profileStatus: CONSTANTS.API_STATUS.SUCCESS,
         })
       }
     } catch (error) {
+      this.setState({
+        profileStatus: CONSTANTS.API_STATUS.FAILURE,
+      })
+
       console.error('Something went wrong:', error)
     }
   }
@@ -92,6 +104,9 @@ class Jobs extends Component {
   getJobs = async () => {
     const {typeOfEmp, salaryRange, searchText} = this.state
     try {
+      this.setState({
+        jobsStatus: CONSTANTS.API_STATUS.IN_PROGRESS,
+      })
       const token = Cookie.get('jwt-token')
 
       const otherOptions = {
@@ -103,15 +118,24 @@ class Jobs extends Component {
         CONSTANTS.API_MAPPING.GET_JOBS
       }?employment_type=${typeOfEmp.join(
         ',',
-      )}&minimum_package=${salaryRange.join(',')}&search=${searchText}`
+      )}&minimum_package=${salaryRange}&search=${searchText}`
       const apiResponse = await fetch(apiUrl, otherOptions)
       if (apiResponse.ok) {
         const jobsResponse = await apiResponse.json()
         this.setState({
+          jobsStatus: CONSTANTS.API_STATUS.SUCCESS,
+
           jobItemsList: jobsResponse.jobs,
+        })
+      } else {
+        this.setState({
+          jobsStatus: CONSTANTS.API_STATUS.FAILURE,
         })
       }
     } catch (error) {
+      this.setState({
+        jobsStatus: CONSTANTS.API_STATUS.FAILURE,
+      })
       console.error('Something went wrong:', error)
     }
   }
@@ -144,52 +168,140 @@ class Jobs extends Component {
   }
 
   onChangeSalaryRange = (event, item) => {
-    const {checked} = event.target
-    if (checked) {
-      this.setState(
-        prevState => ({
-          salaryRange: [...prevState.salaryRange, item.salaryRangeId],
-        }),
-        this.getJobs,
-      )
-    } else {
-      this.setState(prevState => {
-        const newItems = prevState.salaryRange.filter(
-          eachItem => eachItem !== item.salaryRangeId,
+    const {value} = event.target
+    console.log('value', value)
+    this.setState(
+      {
+        salaryRange: item.salaryRangeId,
+      },
+      this.getJobs,
+    )
+  }
+
+  profileView = () => {
+    const {profileDetails} = this.state
+
+    return (
+      <>
+        <img src={profileDetails.profile_image_url} alt="profile-image" />
+        <h4>{profileDetails.name}</h4>
+        <p>{profileDetails.short_bio}</p>
+      </>
+    )
+  }
+
+  getJobsView = () => {
+    const {jobsStatus, jobItemsList} = this.state
+    let view
+    const {length} = jobItemsList
+    switch (jobsStatus) {
+      case CONSTANTS.API_STATUS.SUCCESS:
+        if (length) {
+          view = (
+            <ul>
+              {jobItemsList.map(jobItem => (
+                <JobItem key={jobItem.id} jobDetails={jobItem} />
+              ))}
+            </ul>
+          )
+        } else {
+          view = (
+            <div>
+              <img
+                src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+                alt="No jobs present"
+              />
+              <h4>No Jobs Fount</h4>
+              <p>We could not find any other jobs.Try other filters</p>
+            </div>
+          )
+        }
+        break
+
+      case CONSTANTS.API_STATUS.IN_PROGRESS:
+        view = (
+          <div className="loader">
+            <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
+          </div>
         )
-        return {salaryRange: newItems}
-      }, this.getJobs)
+        break
+
+      case CONSTANTS.API_STATUS.FAILURE:
+        view = (
+          <div>
+            <img
+              src="https://assets.ccbp.in/frontend/react-js/failure-img.png"
+              alt="failure view"
+            />
+            <h4>Oops! Something Went Wrong</h4>
+            <p>We cannot seem to find the page your are looking for</p>
+            <button type="button" className="button" onClick={this.getJobs}>
+              Retry
+            </button>
+          </div>
+        )
+
+        break
+
+      default:
+        break
     }
+    return view
+  }
+
+  getProfileView = () => {
+    const {profileStatus, profileDetails} = this.state
+    let view
+    const {length} = Object.keys(profileDetails)
+    switch (profileStatus) {
+      case CONSTANTS.API_STATUS.SUCCESS:
+        if (length) {
+          view = this.profileView()
+        } else {
+          view = (
+            <div>
+              <button
+                type="button"
+                className="button"
+                onClick={this.getProfile}
+              >
+                Retry
+              </button>
+            </div>
+          )
+        }
+        break
+
+      case CONSTANTS.API_STATUS.FAILURE:
+        view = (
+          <div>
+            <button type="button" className="button" onClick={this.getProfile}>
+              Retry
+            </button>
+          </div>
+        )
+        break
+      case CONSTANTS.API_STATUS.IN_PROGRESS:
+        view = (
+          <div className="loader">
+            <Loader type="TailSpin" color="#00BFFF" height={50} width={50} />
+          </div>
+        )
+        break
+      default:
+        break
+    }
+    return view
   }
 
   render() {
-    const {profileDetails, jobItemsList, searchText} = this.state
-
-    const jobsLength = jobItemsList.length > 0
+    const {searchText, salaryRange} = this.state
 
     return (
       <>
         <div className="jobs-page-container">
           <div className="left-container">
-            <div>
-              {Object.keys(profileDetails).length && (
-                <>
-                  <img
-                    src={profileDetails.profile_image_url}
-                    alt="profile-image"
-                  />
-                  <h4>{profileDetails.name}</h4>
-                  <p>{profileDetails.short_bio}</p>
-                </>
-              )}
-              {Object.keys(profileDetails).length === 0 && (
-                <div>
-                  <button type="button" onClick={this.getProfile}>
-                    Retry
-                  </button>
-                </div>
-              )}
-            </div>
+            <div>{this.getProfileView()}</div>
             <hr />
             <div>
               <h4>Types of Employment</h4>
@@ -213,8 +325,10 @@ class Jobs extends Component {
                 {salaryRangesList.map(item => (
                   <li key={item.salaryRangeId}>
                     <input
+                      name="SalaryRange"
                       id={item.salaryRangeId}
-                      type="checkbox"
+                      type="radio"
+                      value={salaryRange}
                       onChange={event => this.onChangeSalaryRange(event, item)}
                     />
                     <label htmlFor={item.salaryRangeId}>{item.label}</label>
@@ -232,14 +346,7 @@ class Jobs extends Component {
             <button type="button" onClick={this.onClickSearch}>
               Search
             </button>
-            {jobsLength && (
-              <ul>
-                {jobItemsList.map(jobItem => (
-                  <JobItem key={jobItem.id} jobDetails={jobItem} />
-                ))}
-              </ul>
-            )}
-            {!jobsLength && <div>No jobs present</div>}
+            {this.getJobsView()}
           </div>
         </div>
       </>

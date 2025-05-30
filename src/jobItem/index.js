@@ -1,21 +1,49 @@
+import {FaStar, FaMapMarkerAlt, FaSuitcase} from 'react-icons/fa'
+import {withRouter} from 'react-router-dom'
+
 import './index.css'
 
-// company_logo_url: 'https://assets.ccbp.in/frontend/react-js/jobby-app/netflix-img.png'
-// employment_type: 'Internship'
-// id: 'bb95e51b-b1b2-4d97-bee4-1d5ec2b96751'
-// job_description: 'We are looking for a DevOps Engineer with a minimum of 5 years of industry experience, preferably working in the financial IT community. The position in the team is focused on delivering exceptional services to both BU and Dev partners to minimize/avoid any production outages. The role will focus on production support.'
-// location: 'Delhi'
-// package_per_annum: '10 LPA'
-// rating: 4
-// title: 'Devops Engineer'
 const JobItem = props => {
   const {jobDetails} = props
 
+  const onClickJobItem = () => {
+    const {history} = props
+    history.push(`/jobs/${jobDetails.id}`)
+  }
+
   return (
-    <li>
-      <img src={jobDetails.company_logo_url} alt="" />
+    <li className="card" onClick={onClickJobItem}>
+      <div className="img-title-container">
+        <div className="image-container">
+          <img src={jobDetails.company_logo_url} alt="" />
+        </div>
+        <div className="titles-container">
+          <h4>{jobDetails.title}</h4>
+          <div className="icon-container">
+            <FaStar /> <p>{jobDetails.rating}</p>
+          </div>
+          <div className="job-details-container">
+            <div className="icon-container">
+              <div className="icon-container">
+                <FaMapMarkerAlt /> <p>{jobDetails.location}</p>
+              </div>
+              <div className="icon-container">
+                <FaSuitcase /> <p>{jobDetails.employment_type}</p>
+              </div>
+            </div>
+            <div>
+              <p>{jobDetails.package_per_annum}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div>
+        <h4>Description</h4>
+        <p>{jobDetails.job_description}</p>
+      </div>
     </li>
   )
 }
 
-export default JobItem
+export default withRouter(JobItem)

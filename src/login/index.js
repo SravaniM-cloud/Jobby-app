@@ -42,8 +42,8 @@ class Login extends Component {
         CONSTANTS.API_MAPPING.LOGIN_API,
         otherOptions,
       )
+      const data = await apiResponse.json()
       if (apiResponse.ok) {
-        const data = await apiResponse.json()
         Cookie.set('jwt-token', data.jwt_token)
         this.setState({
           errorMessage: '',
@@ -52,13 +52,10 @@ class Login extends Component {
 
         history.push('/home')
       } else {
-        this.setState({
-          errorMessage: apiResponse.error_msg,
-        })
-        console.error('Login failed:', apiResponse)
+        this.setState({errorMessage: data.error_msg})
       }
     } catch (error) {
-      console.error('Something went wrong:', error)
+      console.log('Something went wrong:', error)
     }
   }
 
@@ -94,7 +91,7 @@ class Login extends Component {
               onChange={this.onChangePwd}
             />
             <br />
-            <p>{errorMessage}</p>
+            <p className="error">{errorMessage}</p>
             <button type="submit" className="submit-button">
               Submit
             </button>

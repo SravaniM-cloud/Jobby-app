@@ -16,3 +16,12 @@
 ul {
   list-style-type: none;
 }
+
+.button {
+  padding: 10px;
+  background-color: blue;
+  color: white;
+  margin: 5px;
+  border-radius: 5px;
+  border: 0px;
+}

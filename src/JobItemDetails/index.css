@@ -1,0 +1,11 @@
+.skills-container {
+  display: flex;
+}
+
+.skill-obj-container {
+  display: flex;
+}
+.desContainer {
+  display: flex;
+  justify-content: space-between;
+}

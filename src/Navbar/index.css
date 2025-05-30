@@ -1,0 +1,29 @@
+.nav-bar {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: navy;
+}
+
+.nav-link {
+  color: white;
+  list-style-type: none;
+  margin-left: 10px;
+}
+
+.center-items {
+  display: flex;
+}
+
+.nav-button {
+  padding: 10px;
+  background-color: skyblue;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+}
+
+button {
+  cursor: pointer;
+}

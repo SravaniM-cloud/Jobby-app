@@ -1,0 +1,31 @@
+.card {
+  border-radius: 10px;
+  padding: 10px;
+  background-color: beige;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.icon-container {
+  display: flex;
+  align-items: center;
+}
+.image-container {
+  width: 20%;
+}
+
+.titles-container {
+  padding: 7px;
+  width: 80%;
+}
+
+.img-title-container {
+  display: flex;
+  width: 100%;
+}
+
+.job-details-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
